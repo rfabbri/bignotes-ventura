@@ -1,0 +1,3 @@
+[submodule "bib-fabbri"]
+	path = bib-fabbri
+	url = git@github.com:rfabbri/bib-fabbri.git
