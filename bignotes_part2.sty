@@ -1,0 +1,91 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{bignotes_part2}[2018/09/10 Macros for writing research big notes, part 2]
+
+% TODO - include new command for epheq/aligned eqn environments with braces
+%\renewcommand{\qedsymbol}{$\blacksquare$}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% You have two versions of the macro
+% \draftnote{My note}. The first version puts notes (e.g. My note in the example)
+% into the margin of your document. The second formats the note as nothing. You
+% 'comment out' the version of the macro you don't want (using a % at the
+% beginning of the line).
+\newcommand{\draftnote}[1]{\marginpar{\tiny\raggedright\textsf{\hspace{0pt}#1}}}
+%\newcommand{\draftnote}[1]{}
+%
+% This one is just for the comments for in-line text.
+\newcommand{\indraftnote}[1]{\textcolor{blue}{\texttt{\footnotesize [#1]}}}
+\newcommand{\todo}[1]{\indraftnote{todo: #1}} % Este  "a fazer" é para eu não esquecer
+
+\def\FigureFont{\footnotesize}
+\def\TableFont{\small}
+\def\SectionTitleFont{\large}
+\def\TextFont{\normalsize}
+\def\ReferenceFont{\normalsize}
+\def\Reducefigspace{\vspace{-0.7 truecm}} %0.3
+\def\ReduceRDfigspace{\vspace{-1.51truecm}}
+\def\ReduceEndFigSpace{\vspace{-0.01 truecm}} %0.38
+\def\ReduceRefSpace{\vspace{-0.01 truecm}} %0.5
+\def\SectionSpacing{\vspace{0.5 truecm}} %0.25
+\def\SubSectionSpacing{\vspace{0.5 truecm}} %0.25
+\def\subsubsection#1{\par\medskip\noindent{\bf #1}\quad\nopagebreak}
+\def\Bibspace{\vspace{-0.5cm}}
+\def\ReduceSubsectionBelow{\vspace{-0.2cm}}
+\def\ReduceSubsectionAbove{\vspace{-0.5cm}}
+\def\IncreaseSubSubSectionAbove{\vspace{0.2cm}}
+\def\ReduceEqSpace{\vspace{-0.1cm}}
+\def\ReduceSecSpace{\vspace{-0.1cm}}
+
+%\newcommand{\det}{\text{det}}
+
+% Giblin:
+%\newcommand{\brot}{\overline{\boldsymbol{\mathcal{R}}}}
+%\newcommand{\btransl}{\overline{\mathcal{T}}}
+
+\def\bsq#1{%both single quotes
+\lq{#1}\rq}
+
+% The following are not very good constructs it seems. Better to use just
+% \begin{bmatrix}..\end{\bmatrix}
+
+\newcommand{\datsqbr}[2][rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr]{\left[
+\begin{array}{#1}
+#2\\
+\end{array}
+\right]
+}
+
+
+% -- !lems.sty
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\setmarginsrb{30mm}{27mm}{20mm}{20mm}{12pt}{25pt}{0pt}{5mm}
+\setmarginsrb{30mm}{27mm}{40mm}{25mm}{12pt}{25pt}{0pt}{10mm}
+%             left   top  right bottom headheight headsep footheight footsep 
+
+
+\newtheorem{thm}{Theorem}
+\newtheorem{lem}[thm]{Lemma}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{corolary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{remark}{Remark}[section]
+\newtheorem{problem}{Problem}[section]
+\newtheorem{question}{Question}[section]
+\newtheorem{property}{Property}
+\newtheorem{example}{Example}
+\newtheorem{transformation}{Transformation}
+
+\numberwithin{equation}{section}
+
+\newcommand{\gamad}{\dot{\gama}}
+%\newcommand{\X}{\boldsymbol{X}}
+%\newcommand{\x}{\boldsymbol{x}}
+\newcommand{\xx}{\mathcal{X}}  % used in Giblin's notes
+\newcommand{\ddepth}{\dot{\rho}}      % depth as z
+\renewcommand{\l}{\lambda} % used in problem2-thoughts-giblin

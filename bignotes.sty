@@ -1,0 +1,56 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{bignotes}[2018/09/10 Macros for writing research big notes]
+
+
+\usepackage[ruled,vlined]{algorithm2e}
+
+\usepackage{verbatim,url}
+\usepackage{epsfig}
+\usepackage[bf]{subfigure}
+\usepackage[bf]{caption}
+
+\usepackage{url}
+\usepackage{hyperref}
+\hypersetup{%
+%  colorlinks=false,
+%  citecolor=black,
+   pagebackref=true,
+   breaklinks=true,
+   colorlinks,
+   linktoc=all
+}%
+
+%\usepackage[numbers]{natbib}
+\usepackage{natbib}
+
+% For setmarginsrb:
+\usepackage{vmargin}
+
+\usepackage{nomencl}
+\usepackage{fancyhdr}
+\setlength{\headheight}{15.2pt}
+
+% commutative diags
+\usepackage{tikz-cd}
+
+% customize lists
+\usepackage{enumitem}
+
+\usepackage{multirow}
+
+% used by code copied from NSF'17
+\usepackage{wrapfig}
+
+\renewcommand{\cite}{\citep}
+%\newcommand{\mynewpage}{{\mbox{BLANK PAGE}}\cleardoublepage}
+%\newcommand{\mynewpage}{{\mbox{}}\cleardoublepage}
+\newcommand{\mynewpage}{}
+% For onehalfspacing or doublespacing:
+%\usepackage{setspace}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\nomname}{Table of Notations}
+\newcommand{\avg}{\operatornamewithlimits{avg}}
+\newcommand{\argmin}{\operatornamewithlimits{argmin}}
+\newcommand{\argmax}{\operatornamewithlimits{argmax}}

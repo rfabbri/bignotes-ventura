@@ -1,0 +1,1356 @@
+\mynewpage
+\chapter{Notation and Formulation}\label{sec:notation}
+For the definitive kernel of this document, please refer to our 2016 paper at
+the International Journal of Computer Vision~\cite{Fabbri:Kimia:IJCV2016}.
+We have merged and extended that with more results from the literature,
+as well as~\cite{Fabbri:PhD:2010}.
+
+\section{Exotic Todo}
+\begin{itemize}
+\item Thinking about continous views vs discrete: are there names other than
+  ``discretization'' to the link between the concept -- for instance, derivative
+  -- and the real world, perhaps in category theory? Context - monads. Germs.
+\item **** Frenet frame as differential variations instead of coordinates. Just
+  reinterpretation of vectors. Differential operators.
+\end{itemize}
+
+\section{Modeling with geometric, symbolic and numeric notation}
+
+\todo{This section will talk about my theory of planes of representation in
+vector space geometry}
+
+\todo{This will be a more advanced version, kept simultaneously with a more
+didactic version as a lecture-style chapter ``What is a
+matrix''~\cite{Fabbri:ALN}}
+
+\subsection{Differential Geometry of Curves}
+For our purposes, a 3D space curve $\Curve$ is a smooth map $S \mapsto
+\Gama^w(S)$ of class $C^\infty$ from an interval
+of $\mathbb{R}$
+to $\mathbb{R}^3$, where $S$ is an arbitrary parameter,
+$\tilde S$ is the arc-length parameter, and the superscript
+$w$ denotes the so-called world coordinates (which can be any).\footnote{$\Gama^w$ is \emph{modulo}
+Euclidean transformations $SE(3)$, \ie, the map $\rot\Gama^w + \transl$ gives
+the same $\Curve$, for $\rot \in SO(3)$, and any 3-vector $\transl$,
+\emph{if} $\rot$ and $\transl$ represent change of coordinate system and not
+curve rotation -- this is up to the human modeler.}
+
+The local Frenet frame of $\Curve$ in world coordinates is defined by the unit
+vectors tangent $\T^w$, normal $\N^w$, binormal $\B^w$; $G$ is speed of
+parametrization, curvature $K$, and torsion $\tau$. 
+
+Similarly, a 2D curve $\gamma$ is a map $s \mapsto \gama(s)$ of class
+$C^\infty$ from an interval of $\mathbb{R}$ to $\mathbb{R}^2$, where $s$ is an arbitrary parameter, $\tilde s$
+is arc-length, $g$ is speed of parametrization,
+$\t$ is (unit) tangent, $\n$ is (unit) normal, $\kappa$ is curvature, and $\kappa'$ is curvature derivative.
+\footnote{The map $\gama$ (boldface) is also \emph{modulo} Euclidean
+transformation SE(2), \emph{if} this transformation is meant to represent a change of
+coordinate system, and not curve motion}
+
+We will be concerned with regular curves, so that $G\neq 0$ and $g\neq 0$ unless
+otherwise stated.
+By classical differential geometry~\cite{Carmo:Diff:Geom}, we have
+\begin{equation}\label{eq:TNB}
+\left\{
+\begin{aligned}
+G  &= \|\Gama^{w'}\|  \\
+\T^w &= \frac{\Gama^{w'}}{G}  &\hspace{3mm}
+\N^w &= \frac{\T^{w'}}{\|\T^{w'}\|}  &\hspace{3mm}
+\B^w &= \T^w \times \N^w \\
+K  &= \frac{\|\T^{w'}\|}{G}  &
+\dot{K} &= \frac{K'}{G}  &
+\tau &= \frac{-\B^{w'}\cdot\N^w}{G},
+\end{aligned}\right.
+\end{equation} 
+\begin{equation}
+\begin{bmatrix}
+\T^{w'}\\
+\N^{w'}\\
+\B^{w'}
+\end{bmatrix} = 
+G
+\begin{bmatrix}
+\hfill 0\,   & \hfill K &\,\,\, 0\ \  \\
+-K & \hfill 0 \, &\,\,\, \tau\ \ \\
+\hfill 0\, & -\tau\, &\,\,\, 0\ \ 
+\end{bmatrix}
+\begin{bmatrix}
+\T^w\\
+\N^w\\
+\B^w
+\end{bmatrix},\label{eq:frenet:explicit}
+\end{equation}
+and
+\begin{equation}\label{eq:frenet2D:explicit}
+\begin{aligned}
+g  &= \|\gama'\|, &\hspace{7mm}
+\t &= \frac{\gama'}{g}, &\hspace{7mm}
+\n &= \t^\perp, &\hspace{7mm}
+\kappa &= \frac{\t'\cdot \n}{g}, &\hspace{7mm}
+\dot \kappa &= \frac{\kappa'}{g},
+\end{aligned}
+\end{equation} 
+%\begin{equation}\label{eq:frenet2D:explicit}
+%\hspace{-4.4in}\left\{
+%\begin{aligned}
+%g  &= \|\gama'\|\\
+%\t &= \frac{\gama'}{g} & \hspace{3mm}
+%\n &= \t^\perp\\
+%\kappa &= \frac{\t'\cdot \n}{g} &
+%\dot \kappa &= \frac{\kappa'}{g}
+%\end{aligned}\right.
+%\end{equation} 
+where prime ``$\,'$'' denotes
+differentiation with respect to an arbitrary spatial parameter ($S$ or $s$).
+We use dot ``$\dot\ $'' 
+to denote differentiation with respect to arc-length ($\tilde S$ or $\tilde s$)
+only when an entity clearly belongs to either a space or an image
+curve.
+The matrix equations on the right of~\eqref{eq:frenet:explicit} are the Frenet equations. 
+Note that both the curvature
+derivatives $\dot{K}$ and $\dot \kappa$ are intrinsic quantities. For a slower
+derivation of these entities, see Chapter~\ref{sec:curvemvg:extras}.
+
+\subsection{Geometric Taylor Expansion$^*$ (skip on a first reading)}
+
+\noindent The (geometric) Taylor expansion of $\Gama(s)$ for an arbitrary parameter $S$ is
+\begin{align}\label{eq:taylor:s:grouped}
+\Gama^w(S) = &\Gama^w_0 + S\,G_0\T_0^w + 
+%
+\frac{1}{2}S^2\left[G_0'\T_0^w + G_0^2K_0\N_0^w \right] +\\
+%
+&\frac{1}{6}S^3\left[ (G_0'' - G_0^3K_0^2)\T_0^w + (3G_0G_0'K_0 +
+G_0^3\dot{K_0})\N_0^w +
+G_0^3K_0\tau_0\B_0^w\right]+ \boldsymbol{O}(S^4),\notag
+\end{align}
+where the subscript 0 indicates evaluation at $S = 0$.
+For the first order geometry, we have
+\begin{align}
+\T^w(S) &= \T_0^w + S\T_0^{w'} + \frac{S^2}{2}\T_0^{w''} + \boldsymbol{O}(S^3)\notag\\
+      &= \T_0^w + S\,G_0K_0\N_0^w + \frac{S^2}{2}\, \left[(G_0'K_0 +
+      G_0^2\dot{K_0})\N^w_0 -
+      G^2_0 K_0^2\T_0^w +
+      G^2_0K_0\tau_0\B^w_0\right] + \boldsymbol{O}(S^3) .\notag
+\end{align}
+Similarly, for second order geometry,
+\begin{empheq}[left=\empheqlbrace]{align}
+\N^w(S) &= \N_0^w + S\,G(-K\T^w + \tau\B^w) + \boldsymbol{O}(S^2)\\
+K(S) &= K_0 + SG_0\dot{K}_0 + O(S^2)\\
+\B^w(S) &= \T^w(S)\times\N^w(S)
+\end{empheq}
+and for third order geometry
+\begin{align}
+\tau(S) = \tau_0 + O(S).
+\end{align}
+
+\noindent All formulas in
+Equation~\eqref{eq:frenet:explicit} would apply also to $\gama$ by
+setting $\tau = 0$, except that the convention in 2D is to go counterclockwise to
+define normals, as if there is a hidden $z$-axis pointing out of the 2D plane.
+
+\subsection{Perspective Projection}
+\begin{figure}
+\centering
+   \subfigure[]{ %
+      \label{fig:1view}
+      \includegraphics[height=2in]{figs/crv-mvg-1view.pdf}
+    }
+   \subfigure[]{ %
+      \label{fig:mview:rig}
+      \includegraphics[height=2.5in]{figs/multiview-rig.pdf}
+    }
+\caption{% 
+The perspective projection of a space curve in (a) one view, and
+(b) $n$ views.
+}
+\end{figure}
+The projection of a 3D space curve $\Gamma$ into a 2D image curve $\gamma$ is
+illustrated by Figure~\ref{fig:1view},
+where the world coordinate system is centered at $O$ with basis
+vectors $\{\e_1^w, \e_2^w, \e_3^w\}$. The
+\emph{camera coordinate system} is centered at $\bc$
+with basis vectors $\{\e_1, \e_2, \e_3\}$. A generic way of referring to
+individual coordinates is by means of the specific subscripts $x,y$ and $z$ attached
+to a symbol, \ie, $\boldsymbol{v} = [v_x, v_y, v_z]^\top$ for any vector
+$\boldsymbol v$; other subscripts denote partial differentiation.
+
+When describing coordinates in the
+camera coordinate system we drop the $w$ superscript, \eg, $\Gama$ versus
+$\Gama^w$, which are related by
+\begin{equation}\label{eq:coord:transf:RT}
+\Gama = \rot (\Gama^w - \bc) = \rot\Gama^w + \transl,
+\end{equation}
+where $\rot$ is a rotation and $\transl = -\rot\bc$
+denotes the world coordinate origin in the camera coordinate system.
+\nomenclature[04000]{$\transl(t)$}{
+$(meters)$
+The translation vector that is added when
+passing from coordinates at time~$t$ to the world coordinates
+}%
+
+The projection of a 3D point $\Gama = [x,\, y,\, z]^\top$ onto the image plane
+at $z=1$ is the point $\gama = [\uu,\,\vv,\,1]^\top$ related by
+\begin{equation}\label{eq:projection} \Gama =
+\depth\gama\,\,\,\,\text{or}\,\,\,\, [x,\, y,\, z]^\top =
+[\depth\uu,\,\depth\vv,\,\depth]^\top,
+\end{equation}
+where we say that $\gama$ is in normalized image coordinates (focal distance is
+normalized to 1), and the depth is $\depth = z = \e_3^\top\Gama$%
+  \nomenclature[12000]{$\depth(\xi,\eta,t)$}{$(meters)$ Depth at pixel
+  $(\xi,\eta)$ measured along $z$ axis of camera at time $t$: $\Gama =
+  \depth\gama$}
+  \nomenclature[00800]{$\uu,\vv$}{$(pixels)$ The horizontal and vertical coordinates of the image,
+  respectively.}%
+  %
+  \nomenclature[10100]{$\gama(\xi,\eta,t)$}{
+  (vector, $meters$) 
+  The vector from the camera center to
+  image point $(\xi,\eta)$ at time $t$, in the coordinates of the camera at time~$t$.
+  }%
+  %
+  \nomenclature[10300]{$\gama^w(\xi,\eta,t)$}{
+  (vector, $meters$) 
+  $\gama(\xi,\eta,t)$ in world coordinates
+  }%
+%
+from the third coordinate equation. Observe that image points are treated as 3D points
+with $z = 1$. Thus, we can write
+\begin{align}
+\gama &= \frac{\Gama}{\depth}.
+\label{eq:projection:isolated:gamma}
+\end{align}
+We note that $\f^\top\gama^{(i)} = 0$ and $\f^\top\Gama^{(i)} = \depth^{(i)}$,
+where $\gama^{(i)}$ is the $i^{th}$ derivative of $\gama$ with respect to an
+arbitrary parameter, for any positive integer $i$. Specifically, 
+\begin{equation}\label{eq:depth:derivs}
+\depth = z,\qquad \depth' = G T_z,\qquad \depth'' = G'T_z +
+G^2K N_z.
+\end{equation}
+It is interesting to note that at near/far points of the curve, \ie, $\depth' =
+0$, $T_z = 0$. \draftnote{vaguely reminds me of Lagrange multipliers}
+
+In practice, normalized image coordinates $\gama = 
+[\uu,\,\vv,\,1]^\top $ are described in terms of image
+pixel coordinates $\gama_{im} = 
+[x_{im},\, y_{im},\, 1]^\top$ through the 
+intrinsic parameter matrix $\KK_{im}$ according to
+\begin{equation}\label{eq:intrinsic:parameter:transf}
+\gama_{im} = \KK_{im}\gama,
+\ \ \ \ \ \
+\KK_{im} = \begin{bmatrix}
+\alpha_\uu & \sigma & \uu_o\\
+0 &\alpha_\vv &  \vv_o\\
+0 & 0 &  1
+\end{bmatrix},
+\end{equation}
+where as usual $\uu_o$ and $\vv_o$ are the principal points, $\sigma$ is skew, and
+$\alpha_\uu$ and $\alpha_\vv$ are given by the focal length divided by the width and
+height of a pixel in world units, respectively.
+
+%-------------------------------------------------------------
+
+\subsection{Discrete and Continuous Sets of Views}
+Two scenarios are considered. The first scenario consists of a
+\emph{discrete set of views}
+where a set of $n$ pinhole cameras observe a scene as shown in
+Figure~\ref{fig:mview:rig}, with the last subscript in the symbols indentifying
+the camera, \eg, $\gama_i$ denotes an image point in the $i^{th}$ camera,
+and $\e_{3,i}$ denotes $\e_3$ in the $i^{th}$ view. The last index
+may also be used as a superscript, $\eg$, $\gama_i^j$, which is 
+consistent with Hartley and Zisserman's standard book~\cite{Hartley:Zisserman:multiple:view}.
+The number of points in each image may, thus, be denoted as $n_p^j = n_{p,j}$,
+where $j$ may be omitted if each image has the same number of points.
+The number of images or cameras is denoted $n_c$.
+
+The second scenario consists
+of a \emph{continuous
+set of views} from a continuously moving camera observing a space curve which may
+itself be moving, $\Gama^w(S,t) = [x^w(S,t),\, y^w(S,t),\, z^w(S,t)]^\top$, 
+where $S$ is the parameter along the curve and $t$ is time, 
+described in the camera coordinate system associated with time $t$ as $\Gama(S,t) = \left[ x(S,t),\,
+y(S,t),\, z(S,t) \right]^\top$, Figure~\ref{fig:mview:rig:continuous}. 
+For simplicity, we often omit the parameters $S$ or $t$.
+\begin{figure}
+\centering
+%  \scalebox{0.7}{\includegraphics{figs/multiview-rig-motion.eps}}
+\scalebox{1.0}{\includegraphics{figs/multiview-rig-motion-inkscape.eps}}
+\caption{% 
+Multiview formulation of continuous camera motion and a possibly moving
+contour.
+}\label{fig:mview:rig:continuous}
+\end{figure}
+Let the camera position over time (\emph{camera orbit}) be described by the
+space curve
+$\bc(t)$ and the camera orientation
+by a rotation matrix $\rot(t)$.
+\nomenclature[02000]{$t$}{
+$(seconds)$ Time, parametrizing camera or object motion
+}%
+\nomenclature[03900]{$\rot(t)$}{The rotation matrix from
+coordinates at time~$t$ to the world coordinates}%
+For simplicity, and without loss of
+generality, we take the camera coordinate system at $t=0$ to be the world
+coordinate system, \ie, 
+$\bc(0) = 0$, $\transl(0) = 0$, and $\rot(0) = \id$,
+where $\id$ is the identity matrix. Also, a stationary point can be modeled in
+this notation by making $\Gama^w(t) = \Gama^w(0) = \Gama_0$.
+
+A differential camera motion model using
+time derivatives of $\rot(t)$ and $\transl(t)$ can be used to relate frames in a
+small time interval. Since
+$\rot\rot^\top = \id$,
+\begin{equation}
+\frac{d\rot}{dt}\rot^\top + \rot \frac{d\rot}{dt}^\top = 0,
+\end{equation}
+which implies that $\skewm \OO \doteq \frac{d\rot}{dt}\rot^\top$ is a
+skew-symmetric matrix, explicitly written as
+\begin{equation}
+\skewm \OO = 
+\begin{bmatrix}
+0 & -\Omega_z & \Omega_y \\ \Omega_z & 0 & -\Omega_x \\ -\Omega_y & \Omega_x & 0 
+\end{bmatrix},
+\end{equation}
+so that $\frac{d\rot}{dt} = \skewm\OO \rot$.
+Denote $\OO = \left[\Omega_x,\, \Omega_y,\,
+\Omega_z\right]^\top$ as a vector form characterization of $\skewm\OO$.
+Similarly, the second-derivative of $\rot(t)$ is represented by only three
+additional numbers $\frac{d\skewm\OO}{dt}$, so that
+\begin{equation}\label{eq:rot:tt:atzero}
+\frac{d^2\rot}{dt^2} = \frac{d\skewm \OO}{dt} \rot  + \skewm \OO
+\frac{d\rot}{dt}  = 
+%
+\frac{d\skewm \OO}{dt} \rot  + \skewm \OO^2
+\rot. 
+\end{equation}
+Thus, a second-order Taylor approximation of the camera rotation matrix using
+$R(0) = \id$ is
+\begin{equation}
+\rot(t) \approx \id + \skewm \OO (0) t + \frac{1}{2} \left[ \frac{d\skewm \OO}{dt}(0) +
+\skewm\OO^2(0) \right]t^2.
+\end{equation}
+%
+Similarly, the camera translation can be described by a differential model
+\nomenclature[04001]{$\OO = \frac{d\rot}{dt}(t)\rot^\top(t)$}{
+($rad/s$)
+The first-order approximation of
+Rotation matrix, $\OO = \frac{d\rot(t)}{dt}$,  represented by rotation velocities
+$[\Omega_x,\,\Omega_y,\,\Omega_z]^\top$ about the
+x,y, and z axis, respectively.}%
+%
+\nomenclature[04500]{$\skewm \OO$}{(matrix, $rad/s$)
+Entries of $\OO$ arranged into a
+skew-symmetric matrix such that $\skewm \OO \mathbf v = \OO\times\mathbf
+v$ for any vector $\mathbf v$\nomrefpage}%
+%
+\nomenclature[06000]{$\VV(t) = \frac{d\transl}{dt}(t)$}{(vector, $m/s$)
+Tangential velocity vector to the curve
+$\transl(t)$, \ie,~$\frac{d\transl}{dt}$}%
+%
+\nomenclature[07001]{$\VVspeed(t) = \norm{\frac{d\transl}{dt}(t)}$}{$(m/s)$ Tangential velocity to
+the curve $\transl(t)$}%
+%
+\nomenclature[08000]{$\ttransl(t)$}{
+(unit vector) Unit tangent vector to the curve $\bc(t)$, in camera coordinates
+at time $t$.
+}%
+\nomenclature[08001]{$\ttransl^w(t)$}{
+(unit vector) Unit tangent vector to the curve $\bc(t)$, in world coordinates.
+}%
+%
+\begin{equation}\label{eq:vv:def}
+\VV(t) \doteq \frac{d\transl}{dt}(t) = -\skewm\OO(t)\rot(t)\bc(t) -
+\rot(t)\frac{d\bc}{dt}(t),
+\qquad\qquad
+\VV(0) = -\frac{d\bc}{dt}(0),
+\end{equation}
+and
+\begin{equation}
+\frac{d\VV}{dt}(t) = \frac{d^2\transl}{dt^2}(t) = -\frac{d^2 \rot}{dt^2}(t)\bc(t) -
+2\frac{d\rot}{dt}(t)\frac{d\bc}{dt}(t) - \rot(t)\frac{d^2\bc}{dt^2}(t),
+\end{equation}
+which at $t=0$ gives $\frac{d\VV}{dt}(0) = -2\skewm\OO(0)\frac{d\bc}{dt}(0) -
+\frac{d^2\bc}{dt^2}(0)$.
+
+The choice of whether to adopt the Taylor approximation of $\bc(t)$ or
+$\transl(t)$ as primary is entirely dependent in which domain the higher
+derivatives are expected to diminish\footnote{Ric: this is to be debated
+further}, giving
+\begin{align}
+\transl(t) \approx \VV(0)\,t + \frac{1}{2}\VV_{t}(0)\,t^2,
+\qquad
+\bc(t) \approx -\VV(0)t + \frac{1}{2} \left[ -\VV_t(0) +
+2\skewm\OO(0)\VV(0) \right]t^2.
+\end{align}
+
+\begin{table}
+  \renewcommand{\arraystretch}{1.4}
+  \renewcommand{\tabcolsep}{0.1cm}
+  \begin{center}
+  \tiny
+  \begin{tabular}{|c|l||c|l|}
+  \hline
+  \multicolumn{1}{|c|}{\textbf{Symbol}} &
+  \multicolumn{1}{c||}{\textbf{Description}}&
+  \multicolumn{1}{|c|}{\textbf{Symbol}} &
+  \multicolumn{1}{c|}{\textbf{Description}}\\\hline\hline
+  $\Gama^w$ & 3D point in the world coordinate system &
+  $\t$ & Image curve tangent $\t = \gama'/g$\\\hline
+  %
+  $\Gama$ & 3D point in the camera coord. syst.  {\tiny$\Gama = \rot\Gama^w + \transl$} &
+  $\n$ & Image curve normal $\n = \t^\perp$\\\hline
+  %
+  $\rot$ & Rotation matrix: world to camera coordinates &
+  $\kappa$ & Curvature of the image curve $g\kappa\n = \t'$\\\hline
+  %
+  $\transl$ & Translation vector: world to camera coord. {\tiny $\transl =
+  -R\bc$} &
+  $S$, $\tilde S$ & Space curve arbitrary parameter \& arclength, resp.\\\hline
+  %
+  $\bc$ & The camera center &
+  $G$ & Space curve speed of parametrization $G = \|\Gama'\|$\\\hline
+  %
+  $\skewm \OO$ & $\frac{d\rot}{dt} = \skewm \OO \rot$ &
+  $\T$, $\T^w$ & Space curve tangent camera \& world coord., resp.\\\hline
+  %
+  $\OO$ & Vector form of the 3 entries of $\skewm \OO$ &
+  $\N$, $\N^w$ & Space curve normal: camera \& world coord., resp.\\\hline
+  %
+  $\VV$ & $\VV = \frac{d\transl}{dt} = \skewm\OO\transl - \rot\bc_t$, also 
+  $\VV = [V_x,\,V_y,\,V_z]^\top$
+  &
+  $\B$, $\B^w$ & Space curve binormal: camera \& world coord., resp.\\\hline
+  %
+  $\depth$ & Depth of image point $\Gama = \depth\gama$ &
+  $\e_1$, $\e_2$, $\e_3$ & Basis vectors of the camera coordinate system\\\hline
+  %
+  $\gama$ & 2D point in normalized image coordinates &
+  $\e_1^w$, $\e_2^w$, $\e_3^w$ & Basis vectors of the world coordinate system\\\hline
+  %
+  $\gama_{im}$ & 2D point in pixel image coordinates &
+  $'$ & Diff. with resp. to $S$ or $s$, depending on context\\\hline
+  %
+  $s$, $\tilde s$ & Image curve arbitrary parameter \& arclength, resp. &
+  $\dot\ $  & Diff. with resp. to arclength $\tilde S$ or $\tilde s$ \\\hline
+  %
+  $g$ & Image curve speed of parametrization $g = \|\gama'\|$ & 
+  $\theta$ & The angle $\measuredangle(\T,\gama)$\\\hline
+  $(u,v)$ & Image velocities $\gama_t = [u,\,v,\,0]^\top$ & &\\\hline
+ \end{tabular}
+ \end{center}\label{tab:notation} 
+ \caption{Notation.} 
+\end{table}
+
+
+\subsection{Relating World and Camera-Centric Derivatives.} 
+
+%\draftnote{Ben: I left this proposition in because it is used in some of the
+%calculations later on. I eliminated the obvious part.}
+%\begin{proposition}
+%The velocity in camera coordinates $\vec v_t$ of a vector is related to its
+%velocity in world coordinates $\vec v^w_t$ by
+%\begin{equation}
+%\vec v_t = \skewm \Omega\vec v + \rot\vec v^w_t,\qquad
+%\vec v^w_t = \rot^\top(\vec v_t - \skewm \Omega\vec v).
+%\end{equation}
+%\end{proposition}
+%\begin{proof}
+%Taking the time derivative of $\vec v(t) = \rot(t)\vec v^w$ and using $\rot_t(t) =
+%\skewm \Omega(t) \rot(t)$:
+%\begin{align}
+%\vec v_t &= \rot_t\vec v^w + \rot\vec v_t^w = \skewm\Omega \rot\vec v^w +
+%\rot\vec v_t^w.
+%\end{align}
+%Substituting $\vec v^w = \rot^\top\vec v$, we get the result.
+%\end{proof}
+
+%\begin{corolary}
+%The velocity of the camera center in world coordinates, $\bc_t$, is related to
+%the velocity of the world coordinate system in camera coordinates $\VV = \transl_t$ by:
+%\begin{equation}\label{eq:bc:from:VV:time}
+%\VV = \skewm \Omega\transl - \rot\bc_t, \qquad
+%\bc_t = \rot^\top(\skewm \Omega\transl - \VV).
+%\end{equation}
+%Hence, $\bc_t(0) = -\rot^\top\VV(0)$.
+%\end{corolary}
+%\begin{proof}
+%Since $\transl(t) = -\rot\bc$ so that $-\transl(t) = \rot\bc$, we apply the previous theorem by making
+%$\vec v = -\transl$ and $\vec v^w = \bc$.
+%\end{proof}
+
+
+%\begin{proposition}
+%The velocity of a fixed point in space $\Gama^w(t) = \Gama_0$ in camera coordinates 
+%$\Gama(t)$ at time $t$, is given by
+%\begin{equation}
+%\left\{\begin{aligned}
+%\Gama_t &= \skewm\Omega \rot\Gama_0 + \VV & &\text{for any
+%$t$},\\
+%\Gama_t &= \skewm\Omega\Gama + \VV,& &\text{for $t=0$},
+%\end{aligned}\right.
+%\end{equation}
+%where in the second formula all terms are evaluated at $t=0$.
+%\end{proposition}
+%\begin{proof}
+%Differentiating~\eqref{eq:coord:transf:RT} with respect to $t$,
+%\begin{equation}
+%\Gama_t(t) = \frac{d\Gama(t)}{dt} = \frac{d\rot(t)}{dt}\Gama_0 +
+%\frac{d\transl(t)}{dt}\nonumber
+%= \skewm\Omega(t)\rot(t)\Gama_0 + \VV(t).
+%\end{equation}
+%\end{proof}
+
+%
+% TODO this draftnote might be useful in research:
+%
+%
+%\draftnote{todo: do the same in~\eqref{eq:3D:point:velocity:allt} for $\Gama^w(t) \neq 0$;\\
+%obs: When generalizing the formulas for any $t$, some authors~\cite{Ma:Soatto:etal:book} define $\mathcal V(t) :=  -
+%\skewm\Omega(t)\transl(t)- \VV(t)$}%
+%
+%\noindent .
+%It follows from Equation~\eqref{eq:3d:velocity:camera} that the first order
+%approximation to $\Gama(t)$ at $t=0$ when the world coordinates are placed at
+%the camera at $t=0$, so that $\rot(0) = \id$ and $\frac{d \rot}{dt} (0) = \skewm\Omega$, is
+%\begin{equation}
+%\Gama(t) \approx \Gama_0 + \left( \skewm\Omega(0)\Gama_0 - \VV(0) \right)t\,.
+%\end{equation}
+
+\subsection{Stationary and Non-Stationary Contours}\label{sec:apparent:contour:basics}
+It is important to differentiate between image contours arising from a space
+curve that is changing at most with a rigid transform (stationary contours),
+\eg, reflectance contours and sharp ridges, 
+and image curves arising from deforming space curves (non-stationary contours),
+\eg, occluding contours,  the \emph{contour
+generators} projecting to \emph{apparent contours}.
+Stationary contours are characterized by $\Gama_t^w = 0$ while for 
+occluding contours 
+the viewing direction $\Gama(S,t)$ is tangent to the surface $\surface$ with
+surface normal $\N$ ($\N^w = \rot^\top \N$)
+\begin{align}\label{eq:occlusion:condition}
+\Gama^\top\N = 0,\qquad \text{or}\qquad (\Gama^w-\bc)^\top\N^w = 0.
+\end{align}
+For the image curve $\gama(s,t)$ arising from 
+the occluding contour, Figure~\ref{fig:mview:rig:continuous}, the
+normal $\N$ to $\surface$ at an occluding contour~\cite{Giblin:Motion:Book} can
+be consistently taken as $\N = \frac{\gama\times\t}{\|\gama\times\t\|}$.
+
+Unless otherwise stated, we assume that the parametrization $\Gama^w(S,t)$ of $\surface$ is regular for
+occluding contours, so that $\Gama^w_S(S,t)$ and $\Gama^w_t(S,t)$ form the
+tangent plane to $\surface$ at $\Gama^w(S,t)$, and $t$ can be seen as a
+spatial parameter~\cite{Giblin:Weiss:IVC1995}. The
+correlation of the parametrization $S$ of $\Gamma$ at time $t$ to that of nearby
+times is captured by
+$\Gama_t^w(S,t)$, which 
+is orthogonal to $\N^w$ (since $\N^w$ is orthogonal to the tangent plane),
+but is otherwise arbitrary as a one dimensional choice. It is common to require
+that
+$\Gama^w_t(S,t)$ lay on the (infinitesimal) epipolar plane, spanned by
+$\Gama^w(S,t)$, $\bc(t)$, and $\bc_t(t)$, referred to as the \emph{epipolar
+parametrization}~\cite{Giblin:Motion:Book,Giblin:Weiss:IVC1995},
+\begin{equation}\label{eq:epipolar:param:eq}
+\Gama_t^w\times(\Gama^w-\bc) = 0,\qquad\text{or}\qquad \Gama_t^w =
+\lambda(\Gama^w - \bc)\text{ for some $\lambda$.}
+\end{equation}
+
+
+\subsection{OLD BUT RELEVANT: Additional results relating world and camera-centric derivatives.} 
+
+\begin{proposition}
+Given any 3-\emph{vector} $v$, that may be time-dependent or not, then its camera
+coordinates $\vec v$ are related to its world coordinates $\vec v^w$ by:
+\begin{equation}
+\vec v(t) = \rot(t)\vec v^w(t),
+\end{equation}
+and the velocity in camera coordinates $\vec v_t$ is related to the
+velocity in world coordinates $\vec v^w_t$ by
+\begin{equation}
+\vec v_t = \skewm \Omega\vec v + \rot\vec v^w_t
+\end{equation}
+or, equivalently,
+\begin{equation}
+\vec v^w_t = \rot^\top(\vec v_t - \skewm \Omega\vec v)
+\end{equation}
+\end{proposition}
+\begin{proof}
+The vector is translation-independent, so that we can always find two points
+such that $v = p_1 -p_2$ in 3D. Since we have
+\begin{align}
+\vec p_1 &= \rot\vec p^w_1 + \transl\\
+\vec p_2 &= \rot\vec p^w_2 + \transl,\\
+\intertext{then, subtracting, we get}
+\vec p_1 -\vec p_2 &= \rot(\vec p^w_1-\vec p^w_2)\\
+\vec v &= \rot\vec v^w.
+\end{align}
+The second part of the proof follows by taking the derivatives and using $\rot_t(t) =
+\skewm \Omega(t) \rot(t)$:
+\begin{align}
+\vec v_t &= \rot_t\vec v^w + \rot\vec v_t^w\\
+\vec v_t &= \skewm\Omega \rot\vec v^w + \rot\vec v_t^w\\
+%
+\shortintertext{substituting $\vec v^w = \rot^\top\vec v$,}
+%
+\vec v_t &= \skewm\Omega \vec v + \rot\vec v_t^w
+\end{align}
+\end{proof}
+\begin{corolary}
+The velocity of the camera center in world coordinates, $\bc_t$, is related to
+$\VV = \transl_t$ by:
+\begin{equation}\label{eq:VV:from:bc:time:deriv}
+\VV = \skewm \Omega\transl - \rot\bc_t
+\end{equation}
+or, equivalently,
+\begin{equation}
+\bc_t = \rot^\top(\skewm \Omega\transl - \VV).
+\end{equation}
+Hence,
+\begin{equation}
+\bc_t(0) = -\rot^\top\VV(0).
+\end{equation}
+\end{corolary}
+\begin{proof}
+Since $\transl(t) = -\rot\bc$ so that $-\transl(t) = \rot\bc$, we apply the previous theorem by making
+$\vec v = -\transl$ and $\vec v^w = \bc$.
+\end{proof}
+
+
+
+\begin{proposition}
+The velocity of a fixed point in space $\Gama^w(t) = \Gama_0$ in camera coordinates 
+$\Gama(t)$ at time $t$, is given by
+\begin{align}
+\Gama_t &= \skewm\Omega \rot\Gama_0 + \VV & &\text{for any $t$}\label{eq:3D:point:velocity},
+%
+\intertext{and}
+%
+\Gama_t &= \skewm\Omega\Gama + \VV,& &\text{for $t=0$}\label{eq:3D:point:velocity:at:zero},
+\end{align}
+where in the second formula all terms are evaluated at $t=0$.\footnote{Which is
+why we drop the index in $\Gama_0$.}
+\end{proposition}
+\begin{proof}
+Differentiating~\eqref{eq:coord:transf:t} with respect to $t$,
+\begin{align}
+\Gama_t(t) &= \frac{d\Gama(t)}{dt} = \frac{dR(t)}{dt}\Gama_0 +
+\frac{d\transl(t)}{dt}\nonumber\\
+%
+&= \skewm\Omega(t)\rot(t)\Gama_0 + \VV(t).
+\end{align}
+The formula for $t=0$ is obtained by noting that $\rot(0) = \id$.
+\end{proof}
+
+\begin{proposition}
+The velocity of a moving 3D point $\Gama^w(t)$, whose motion is parametrized by
+$t$, in camera coordinates, is related to its velocity in world
+coordinates by: 
+\begin{equation}\label{eq:3D:point:velocity:allt}
+\Gama_t = \skewm\Omega\Gama + \rot\Gama^w_t - \rot\bc_t(t).\ \ \ \ \text{for any $t$.}
+\end{equation}
+For a fixed point, we have that $\Gama^w_t = 0$, therefore its
+relative velocity in camera coordinates is due solely to camera motion, given as:
+\begin{equation}\label{eq:3d:velocity:camera}
+\Gama_t = \skewm\Omega\Gama - \rot\bc_t.\ \ \ \text{for any $t$.}
+\end{equation}
+\draftnote{Ric: $\VV$ and $\VV_t$ as you have it do not have physical meaning;
+$\bc_t$ and $\bc_{tt}$ do!}
+\end{proposition}
+\begin{proof}
+Differentiating~\eqref{eq:coord:transf:t:anypoint} with respect to time,
+\begin{align}
+\Gama_t &= \rot_t\Gama^w + \rot\Gama^w_t + \transl_t\\
+&= \skewm\Omega \rot\Gama^w + \rot\Gama^w_t + \VV
+%
+\intertext{But $\rot\Gama^w = \Gama - \transl$ from~\eqref{eq:coord:transf:t:anypoint}, so that}
+%
+\Gama_t &= \skewm\Omega(\Gama - \transl) + \rot\Gama^w_t + \VV\\
+&= \skewm\Omega\Gama + \rot\Gama^w_t + \VV - \skewm\Omega\transl.
+\end{align}
+From~\eqref{eq:VV:from:bc:time:deriv} we have $\VV - \skewm\Omega\transl =
+-\rot\bc_t$, and plugging this in gives the result.
+\end{proof}
+\draftnote{todo: do the same in~\eqref{eq:3D:point:velocity:allt} for $\Gama^w(t) \neq 0$;\\
+obs: When generalizing the formulas for any $t$, some authors~\cite{Ma:Soatto:etal:book} define $\mathcal V(t) :=  -
+\skewm\Omega(t)\transl(t)- \VV(t)$}%
+
+\noindent If the world coordinates are placed at the camera at $t=0$, then
+$\rot(0) = \id$ and $\frac{d \rot}{dt} (0) = \skewm\Omega$.
+It follows from Equation~\eqref{eq:3D:point:velocity} that the first order
+approximation to $\Gama(t)$ at $t=0$ is
+\begin{equation}
+\Gama(t) \approx \Gama_0 + \left( \skewm\Omega(0)\Gama_0 - \VV(0) \right)t\,.
+\end{equation}
+
+\subsection{OLD: Spherical Image Representation} The image point corresponding to $\Gama(t)$ in
+image camera coordinates is denoted $\gama(t) =
+\left[ \uu(t), \vv(t), 1 \right]^\top$, %
+%
+  \nomenclature[00800]{$\uu,\vv$}{$(pixels)$ The horizontal and vertical coordinates of the image,
+  respectively.}%
+  %
+  \nomenclature[10100]{$\gama(\xi,\eta,t)$}{
+  (vector, $meters$) 
+  The vector from the camera center to
+  image point $(\xi,\eta)$ at time $t$, in the coordinates of the camera at time~$t$.
+  }%
+  %
+  \nomenclature[10300]{$\gama^w(\xi,\eta,t)$}{
+  (vector, $meters$) 
+  $\gama(\xi,\eta,t)$ in world coordinates
+  }%
+%
+We can also represent an image point by the
+corresponding point on the sphere centered on the camera focal point and with
+the focal radius, \ie, with $\ugama = \frac{\gama}{\|\gama\|} =
+\frac{\Gama}{\|\Gamma\|}$, and with
+$\Gama = \udepth\ugama$. 
+
+\begin{proposition}
+Let $\gama = (\uu,\vv,1)^\top$ be an image point and denote $\ugama =
+\frac{\gama}{\|\gama\|}$ the unit vector pointing to $\gama$ from the camera
+focal point. Then a spherical representation of $\ugama$
+\begin{equation}
+\ugama = (\cos\phi\sin\theta,\,\sin\phi\sin\theta,\,\cos\theta)
+\end{equation}
+is related to $\gama$ by mapping $(\theta,\phi)$ to $(\uu,\vv)$ as follows:
+\begin{empheq}[left=\empheqlbrace]{align}
+\uu &= \cos\phi\tan\theta\\
+\vv &= \sin\phi\tan\theta,
+\end{empheq}
+or mapping $(\uu,\vv)$ to $(\theta,\phi)$ using
+\begin{empheq}[left=\empheqlbrace]{align}
+\tan\phi &= \frac{\vv}{\uu}\\
+\tan\theta &= \sqrt{\uu^2 + \vv^2},
+\end{empheq}
+or
+\begin{empheq}[left=\empheqlbrace]{align}
+(\cos\phi, \sin\phi) &= \frac{1}{\sqrt{\uu^2+\vv^2}} (\uu,\vv)\\
+(\cos\theta, \sin\theta) &= \frac{1}{\sqrt{\uu^2+\vv^2 + 1}}
+(1,\sqrt{\uu^2+\vv^2})\\
+\end{empheq}
+and 
+\begin{equation}
+\|\gama\| = \frac{1}{\cos\theta}.
+\end{equation}
+\end{proposition}
+\draftnote{Ben: there is material on optical flow using the spherical
+representation in Section~\ref{sec:optical:flow:survey}
+.}
+\begin{proof}
+Equating
+\begin{equation}
+\frac{(\uu,\,\vv,\,1)}{\sqrt{\uu^2 + \vv^2 + 1}} =
+(\cos\phi\sin\theta,\,\sin\phi\sin\theta,\,\cos\theta),
+\end{equation}
+we get
+\begin{empheq}[left=\empheqlbrace]{align}
+\frac{\uu}{\sqrt{\uu^2 + \vv^2 + 1}} &= \cos\phi\sin\theta\\
+\frac{\vv}{\sqrt{\uu^2 + \vv^2 + 1}} &= \sin\phi\sin\theta\\
+\frac{1}{\sqrt{\uu^2 + \vv^2 + 1}} &= \cos\theta,
+\end{empheq}
+and the results follow by deriving pairs of these equations.
+\end{proof}
+
+The vector $\Gama(t)$ can be represented in spherical coordinates using
+the transformation
+%-------- Slant/tilt/spherical angles
+\begin{equation}
+(x,y,z) = (\udepth\cos\phi\sin\theta,\udepth\sin\phi\sin\theta,\udepth\cos\theta)\,,
+\end{equation}%
+%
+  \nomenclature[02900]{$\udepth(t),\,\theta(t),\,\phi(t)$}{($meters$ and
+  $radians$) Polar coordinates in the camera coordinate system at time~$t$}%
+  \nomenclature[11000]{$\ugama(\xi,\eta,t)$}{(unit vector) 
+  $\gama(\xi,\eta,t)/\norm{\gama(\xi,\eta,\t)}$
+  }%
+  %
+  \nomenclature[12100]{$\udepth(\xi,\eta,t)$}{(meters) 
+  Depth at pixel $(\xi,\eta)$ measured along visual ray at time $t$: $\Gama =
+  \udepth\ugama$}%
+  %
+  \nomenclature[11200]{$\hat\gama^w(\xi,\eta,t)$}{(unit vector)
+  $\hat\gama(\xi,\eta,t)$ in world coordinates}%
+%
+which in inverse form is
+\begin{empheq}[left=\empheqlbrace]{align}
+\udepth(x,y,z) &= (x^2 + y^2 + z^2)^{1/2}\\
+%
+\theta(x,y,z) &= \tan^{-1}\left( \frac{\sqrt{x^2 + y^2}}{z} \right) =
+  \tan^{-1}\left( \frac{\udepth}{z} \right)\\
+%
+\phi(x,y,z) &= \itan\left( \frac{y}{x} \right)\,,
+\end{empheq}
+see Figure~\ref{fig:spherical:coords}.
+
+\subsection{OLD: Occluding Contours}\label{sec:apparent:contour:basics:old}
+Occluding contours in 3D are also called \emph{contour generators}, while 
+projected contour generators are called \emph{apparent contours}.
+The only care we have to take when modeling occluding contours in our approach
+is that the contour generator is not stationary.  We have to keep in mind the
+difference between $\Gama^w(t)$ and $\Gama(t)$ in that 
+$\Gama^w(t)\neq\Gama^w(0)$ and $\Gama^w(0)=\Gama(0)$.
+
+The assignment of a
+correspondence between a point $\Gama^w(s,t)$ and $\Gama^w(s,t+\Delta t)$ is at the
+moment completely arbitrary. This assignment can be captured by the tangent
+vector $\Gama^w_t(s,t)$, the limiting case of $\Gama^w(s,t+\Delta t) - \Gama^w(s,t)$.
+Since this tangent vector is orthogonal to $\N$, the assingment of
+correspondence is a one-dimensional choice, and it is common to require that
+$\Gama^w_t(s,t)$ lies on the (infinitesimal) epipolar plane, which is spanned by
+$\Gama(s,t)$, $\bc(t)$, and $\bc_t(t)$. This is called epipolar parametrization~\cite{Giblin:Motion:Book}.
+Such epipolar condition would imply that the respective 3D occluding
+points $\Gama^w(s,t)$ and $\Gama^w(s,\tDt)$ both lie in that epipolar plane,
+even though they are not the same 3D point.  The tangent vector $\Gama_t^w$ lies in the tangent plane to the surface at the
+point $\Gama^w$. If we also impose that $\Gama_t^w$ lies in the epipolar plane
+spanned by $\Gama^w$, $\bc$, $\bc_t$, then it must be along the visual
+direction.
+
+\nomenclature[17000]{$n_c$}{Number of views, when considering discrete camera motion}
+%
+\nomenclature[17005]{$n_p^j = n_{p,j}$}{Number of points in view $j$, when considering discrete
+sets of points}
+
+\nomenclature[03550]{$\Gama_j$}{In the case of continuous camera motion, $\Gama_0$ is $\Gama$
+at $t=0$ or simply $\Gama(0)$. In the case of discrete camera motion, $\Gama_j$
+denotes the 3D point with index $j=1,\dots,n_p$.}% 
+%
+\nomenclature[10350]{$\gama^i_j$}{Coordinates of j-th point in view $i$}%
+\nomenclature[10360]{$\gama^i$}{A 2D point in view $i$}%
+
+\nomenclature[18100]{$el_k^i(p)$}{Epipolar line from point $p$ of view $k$ to view $i$}
+\nomenclature[18110]{$eb_k^i(p)$}{Epipolar error band from point $p$ of view $k$ to view $i$}
+\nomenclature[18120]{$e_k^i(p)$}{Epipole from view $k$ to view $i$}
+\nomenclature[18000]{$F_{k,i}$}{Fundamental matrix from view $k$ to view $i$}
+
+\mynewpage
+
+%--------
+
+%\begin{table}
+%\hspace{-1.1in}
+%\begin{tabular}{|c|c|l|} \hline
+%\textbf{Symbol }   & \textbf{Units }       &\textbf{Description}\\
+%     \hline\hline
+%$\xi,\eta$ & pixels & The horizontal and vertical coordinates of the image,
+%respectively \\\hline
+%
+%$t$ & seconds & Time, parametrizing camera or object motion\\\hline
+%
+%
+%$\udepth^w,\,\theta^w,\,\phi^w$ & meters, radians & The polar coordinates of the world\\\hline
+%
+%$x(t),\,y(t),\,z(t)$ & meters & Coordinates in the camera coordinate system at time $t$\\\hline
+%
+%$\udepth(t),\,\theta(t),\,\phi(t)$ & meters & Polar coordinates in the camera coordinate system at time $t$\\\hline
+%
+%$\lbar\Gama = \left( \bar x,\,\bar y,\,\bar z \right)$ & meters (vector) & A
+%point in the object coordinate system\\\hline
+%
+%$\Gama^w$ & meters (vector)& A point in world coordinates\\\hline
+%
+%$\Gama(t)$ & meters (vector)& A point in the coordinate system of the camera at
+%time $t$\\\hline
+%
+%$R(t)$ & rotation matrix & The rotation matrix from coordinates at time $t$ to
+%the world coordinates \\\hline
+%
+%$\mathcal{T}(t)$ & meters (vector)& 
+%\begin{minipage}[l]{0.9\linewidth}
+%The translation vector that is added when
+%passing from coordinates at time $t$ to the world coordinates.
+%
+%
+%\vspace{0.5mm}
+%\end{minipage}
+%\\\hline
+%
+%$\Omega = \frac{dR}{dt}(t)R^\top(t)$ & radian/second (vector)& 
+%\begin{minipage}[l]{0.9\linewidth}
+%The first-order approximation of
+%Rotation matrix, $\Omega = \frac{dR(t)}{dt}$,  represented by rotation velocities
+%$(\Omega_x,\,\Omega_y,\,\Omega_z)$ about the
+%x,y, and z axis, respectively.
+%\end{minipage}
+%\\\hline
+%
+%$\skewm \Omega(t)$ & radian/second (matrix) & Entries of $\Omega$ arranged into a
+%skew-symmetric matrix, $\skewm \Omega \mathbf v = \Omega\times\mathbf
+%v$\\\hline
+%
+%$\VV(t) = \frac{d\transl}{dt}(t)$ & velocity vector & Tangential velocity vector to the curve
+%
+%$\transl(t)$, \emph{i.e.}, $\frac{d\transl}{dt}$\\\hline
+%
+%$\VVspeed(t) = \|\frac{d\transl}{dt}(t)\|$ & velocity & Tangential velocity to
+%the curve $\transl(t)$\\\hline
+%
+%$\ttransl(t) = \frac{1}{\VVspeed}\frac{d\transl}{dt}(t)$ & unit vector & Unit tangent vector to the curve $\transl(t)$\\\hline
+%
+%$\bc(t) = -R^\top(t)\transl(t)$ & curve & 
+%\begin{minipage}[l]{0.9\linewidth}
+%The trajectory of the camera center in time $t$ expressed in
+%world coordinates, also referred to as the camera orbit. 
+%\end{minipage}
+%\\\hline
+%
+%$I(\xi,\eta,t)$ & Intensity & Image intensity at a pixel $(\xi,\eta)$ at time $t$\\\hline
+%
+% & meters (vector) & 
+%\begin{minipage}[l]{0.9\linewidth}
+%The vector from the camera center to
+%image point $(\xi,\eta)$ at time $t$, in the coordinates of the camera at time
+%$t$.
+%\vspace{1mm}
+%\end{minipage}
+%\\\hline
+%
+%$\ugama(\xi,\eta,t)$ & unit vector & $\gama(\xi,\eta,t)/\|\gama(\xi,\eta,\t)\|$\\\hline
+%
+%$\gama^w(\xi,\eta,t)$ & meters (vector) & $\gama(\xi,\eta,t)$ in world coordinates\\\hline
+%
+%$\hat\gama^w(\xi,\eta,t)$ & unit vector & $\hat\gama(\xi,\eta,t)$ in world coordinates\\\hline
+%
+%$\depth(\xi,\eta,t)$ & meters & Depth at pixel $(\xi,\eta)$ measured along $z$
+%axis of camera at time $t$: $\Gama = \depth\gama$.\\\hline
+%
+%$\udepth(\xi,\eta,t)$ & meters & Depth at pixel $(\xi,\eta)$ measured along
+%visual ray at time $t$: $\Gama = \udepth\ugama$.\\\hline
+%
+%$\field(\xi,\eta,t)$ & velocity vector $(m/s)$ & The image velocity vector of a
+%point due to object-camera relative motion\\\hline
+%
+%$\ufield(\ugama,t)$ & 
+%velocity vector $(rad/s)$ & 
+%\begin{minipage}[l]{0.9\linewidth}
+%\vspace{0.5mm}
+%The velocity vector of a
+%point's visual direction due to object-camera relative motion
+%\vspace{0.5mm}
+%\end{minipage}
+%\\\hline
+%
+%$u,\,v$ & $m/s$ & 
+%\begin{minipage}[l]{0.9\linewidth}
+%$\field = (u,\,v)$, obtained from $\frac{d\gama}{dt} = (u,v,0)^\top$, the extrinsic representation of the
+%velocity field in image coordinates.
+%\vspace{0.5mm}
+%\end{minipage}
+%\\\hline
+%
+%$\hat u,\,\hat v$ & $rad/s$ & 
+%\begin{minipage}[l]{0.9\linewidth}
+%$\ufield = (\hat u,\,\hat v)$, obtained from
+%$\frac{d\ugama}{dt}(\theta(t),\phi(t))$, the extrinsic representation of the
+%velocity field in spherical image coordinates.
+%\vspace{0.5mm}
+%\end{minipage}
+%\\\hline
+%
+%$\N$ & unit vector & Normal to the surface of the object\\\hline
+%
+%$\sigma$ & radians & Slant -- $\measuredangle(\N,\ugama)$, the angle between the normal $\N$ and the visual
+%direction $\ugama$\\\hline
+%
+%$\nu$ & radians & 
+%\begin{minipage}[l]{0.9\linewidth}
+%\vspace{0.5mm}
+%Tilt -- $\measuredangle \left(\left[\N -
+%(\N\cdot\ugama)\N\right],\,x\text{-axis}\right)$, the angle between the projected normal and the $x$-axis.
+%\vspace{0.5mm}
+%\end{minipage}
+%\\\hline
+%
+%$\kappa_1,\,\kappa_2$ & $1/m^2$ & Principal curvatures of the
+%surface\\\hline
+%
+%$\mathbf L$ & meters (vector) & Position of light source in the world coordinates\\\hline
+%
+%$\albedo$ & unit-less & Reflectance (albedo)\\\hline
+%$e_1,\,e_2,\,e_3$ & unit vectors & 
+%\begin{minipage}[l]{0.9\linewidth}
+%\vspace{0.5mm}
+%Canonical basis in any coordinate system,
+%$e_1 = (1,\,0,\,0)^\top$, $e_2 = (0,\,1,\,0)^\top$, $e_2 = (0,\,0,\,1)^\top$
+%\vspace{0.5mm}
+%\end{minipage}
+%\\\hline
+%\end{tabular}
+%\caption{Table of Notation.}
+%\end{table}
+
+\subsection{Multiview Differential Geometry of Surfaces: Notation}\label{sec:dg:surf:notation}
+
+\indraftnote{
+todo
+\begin{itemize}
+\item Include the figures about the numerical experiments with pov-ray
+\end{itemize}
+}
+In this manuscript, up to this date, we present a preliminary study and theoretical results on
+the local differential geometry of surfaces in multiple views, including
+surface-induced image flow and the multiview behavior of shading.
+Chapter~\ref{sec:surf:geometry} reviews useful background material related to
+the differential geometry of surfaces in the context of 3D vision.
+
+The object local coordinate system is defined to be centered at a select point on the
+surface of the object, $\Gama_c(0) =
+\depth_{c}(0)\left[\uu_c(0),\vv_c(0),1\right]^\top$, and with the direction
+$\bar z$ aligned with the surface normal and with $\bar x$ and $\bar y$ defined
+as the direction of principal curvatures $\kappa_1$ and $\kappa_2$,%
+%
+  \nomenclature[14000]{$\kappa_1,\,\kappa_2$}{($1/m^2$) Principal curvatures of
+  the surface}
+%
+assuming they are different from each
+other (non-umbilical points), and such that the resulting coordinate system has
+same orientation as the camera coordinate system. 
+
+A point in local coordinates
+is hence denoted
+$\lbar \Gama = \left[\bar x, \bar y, \bar z\right]^\top$.  %
+\nomenclature[02950]{$\lbar\Gama = \left( \bar x,\,\bar y,\,\bar z \right)$}{
+$(meters)$ A point in the object coordinate system}
+The object surface near the origin $\lbar \Gama_c = \left[0,0,0\right]^\top$ 
+is then described in Monge patch form as:
+\begin{equation}\label{eq:BB:paraboloid:taylor}
+\bar z = \frac{1}{2}\kappa_1\bar x^2 + \frac{1}{2}\kappa_2\bar y^2 + \cdots
+\end{equation}
+We define the curvature matrix $\mathbf K$ as:\begin{equation}
+\mathbf K = \begin{bmatrix}\label{eq:BB:K:matrix}
+-\kappa_1 & 0 & 0\\
+0 & -\kappa_2 & 0\\
+0 & 0 & 0
+\end{bmatrix},
+\end{equation} 
+which is the canonical matrix for a paraboloid, and
+write~\eqref{eq:BB:paraboloid:taylor} as
+\begin{equation}\label{eq:BB:quadratic:matricial:taylor}
+e_3^\top
+\overline \Gama
++
+\frac{1}{2}
+\overline \Gama^\top 
+\mathbf K
+\overline \Gama
++\dots = 0
+\end{equation}
+where we use the notation
+%
+\begin{align}
+e_1  = 
+\begin{bmatrix}
+1\\ 0\\ 0 
+\end{bmatrix}
+\,\,\,
+e_2  = 
+\begin{bmatrix}
+0\\ 1\\ 0 
+\end{bmatrix}
+\,\,
+e_3  = 
+\begin{bmatrix}
+0\\ 0\\ 1 
+\end{bmatrix}.
+\end{align}%
+  \nomenclature[16000]{$\e_1,\,\e_2,\,\e_3$}{(unit vectors)
+  Canonical basis in any coordinate system,
+  $\e_1 = (1,\,0,\,0)^\top$, $\e_2 = (0,\,1,\,0)^\top$, $\e_2 = (0,\,0,\,1)^\top$
+  }%
+%
+%
+Later in this chapter we assume the object can locally be approximated by
+truncating the above equation to second-order, obtaining a special quadric
+surface model $\surf$.  This second-order surface approximation is an elliptic
+paraboloid if $\kappa_1 \kappa_2 >
+0$, a hyperbolic paraboloid if $\kappa_1 \kappa_2 < 0$, or a plane if $\kappa_1
+= \kappa_2 = 0$.
+The 3D points written in the camera coordinates at time~$t$ can be written in
+terms of the Monge patch coordinates as in Figure~\ref{fig:project-quadric},
+\begin{figure}
+\centering
+\includegraphics[width=4.5in]{figs/quadric-rig.eps}
+\caption{Projection of a quadric in images.}
+\label{fig:project-quadric}
+\end{figure}
+%
+\begin{equation}
+%
+\Gama(t)
+=
+\overline{R}(t)\overline\Gama(t)+\overline{\transl}(t)
+\label{eq:BB:worl:to:camera}
+%
+\end{equation}
+%
+%
+where
+%
+\begin{align}
+\overline{\rot}(t)&=\rot(t)\overline R_0 \\
+\overline{\transl}(t)&=\rot(t)\overline \transl_0 + \transl(t)\label{eq:BB:tbart:from:tbar0}
+\end{align}
+%
+We also have the following notation:
+\begin{align}
+\overline \rot_0 = 
+\begin{bmatrix}
+a_1 & a_2 & a_3\\
+b_1 & b_2 & b_3\\
+c_1 & c_2 & c_3
+\end{bmatrix}\,\,\,\,\,\,
+\overline \transl(t) = 
+\begin{bmatrix}
+\overline \transl_x\\
+\overline \transl_y\\
+\overline \transl_z
+\end{bmatrix}.
+\end{align}
+
+\noindent The unit normal $\N = (\N_x,\,\N_y,\,\N_z)$%
+  \nomenclature[14000]{$\N$}{(unit vector)
+  Normal to the surface of the object, usually written in camera coordinates
+  unless otherwise stated.
+  }
+%
+to the surface, written in camera coordinates, is determined by the
+slant and tilt angles (more later). The world coordinates for the normal will be
+denoted $\N^w$, and we can write $\N = R\N^w$.
+  \nomenclature[14005]{$\N$}{(unit vector)
+  Normal to the surface of the object, usually written in camera coordinates
+  unless otherwise stated.
+  }
+\draftnote{TODO ASAP: parametrize normal in terms of tilt and slant}
+
+The third column of the rotation matrix $\overline R(t)$ is the normal $\N$ written
+in camera coordinates at time~$t$:
+\begin{equation}
+\N(t) = \overline R(t)\e_3
+\end{equation}
+where $\e_3$ is the normal in local coordinates of the surface patch. Therefore,
+only two angles, \emph{e.g.}\ slant $\sigma$%
+%
+  \nomenclature[13100]{$\sigma$}{$(radians)$ Slant --
+  $\measuredangle(\N,\ugama)$, the angle between the normal $\N$ and the visual
+  direction $\ugama$}
+%
+and tilt $\nu$%
+%
+  \nomenclature[13150]{$\nu$}{$(radians)$ Tilt -- $\measuredangle \left(\left[\N
+  - (\N\cdot\ugama)\N\right],\,x\text{-axis}\right)$, the angle between the
+  projected normal and the $x$-axis.
+  }
+%
+, appear in the third
+column. The first two columns are the camera coordinates of unit vectors along the
+$\bar x$, and $\bar y$ directions, and this is completely defined by the normal
+and an in-plane rotation $\psi$. This is given in more details as follows.
+The surface normal may be described in terms of slant
+$\sigma$ and tilt $\nu$, 
+\begin{equation}\label{eq:BB:N:slant:tilt}
+\N = \left( \cos\nu\sin\sigma,\,\sin\nu\sin\sigma,\cos\sigma \right)^\top,
+\end{equation}
+see Figure~\ref{fig:slant:tilt}. 
+
+\begin{figure}
+\centering
+   \subfigure[]{ %
+    \label{fig:spherical:coords}
+      \begin{minipage}[c]{0.46\linewidth}%
+         \centering
+         \scalebox{0.33}{\includegraphics{figs/Spherical_coordinates-norhobar.eps}}
+      \end{minipage}}
+    \subfigure[]{ %
+      \label{fig:slant:tilt}
+      \begin{minipage}[c]{0.46\linewidth}%
+         \centering
+         \scalebox{0.33}{\includegraphics{figs/slant-tilt.eps}}
+      \end{minipage}}
+\caption{% 
+(a) Spherical coordinates used in this text, and (b) The
+orientation of a (tangent) plane with respect to the camera plane can be given
+by the \emph{slant} -- which is the angle between the normal of the plane and
+the viewing direction -- and the tilt -- which is the angle the projected normal
+makes with the $x$-axis of the camera coordinate system (from~\cite{Forsyth:Ponce:Book}).
+}
+\end{figure}
+
+We define $\psi$ as the in-plane rotation of the
+local $x$ and $y$ axes with respect to a predefined reference coordinate frame of the
+tangent plane. We now derive an explicit expression for this reference
+coordinate frame in terms of the camera frame, with the intention of deriving a
+parametrization of the rotation matrix by the angles $\sigma,\nu,\psi$.
+The reference frame for measuring $\psi$, denoted $\e_1^\N,\e_2^\N$, is conveniently 
+defined with respect to the camera frame: $\e_1^\N$ is the orthogonal projection of $\e_1$ onto
+the tangent plane with normal $\N$, and $\e_2^\N$ is choosen to form a
+right-handed frame $(\e_1^\N,\e_2^\N,\N)$. This can be written analytically as:
+\begin{equation}
+\left\{
+\begin{aligned}~\label{eq:BB:ref:vecs:e:N} 
+\e_2^\N &\doteq \N\times\e_1\\
+\e_1^\N &\doteq \e_2^\N\times\N,
+\end{aligned}
+\right.
+\end{equation}
+which allows us to express the local $x$ and $y$ direction vectors $\bar \e_1$
+and $\bar \e_2$, respectively, as:
+\begin{equation}~\label{eq:BB:local:vecs:ref}
+\left\{
+\begin{aligned}
+\bar \e_1 &= \cos\psi\,\e_1^\N + \sin\psi\,\e_2^\N + 0\,\N\\
+\bar \e_2 &= \sin\psi\,\e_1^\N - \cos\psi\,\e_2^\N + 0\,\N.
+\end{aligned}
+\right.
+\end{equation}
+Using~\eqref{eq:BB:N:slant:tilt} into~\eqref{eq:BB:ref:vecs:e:N}, we can write the
+reference vectors in terms of $\sigma$ and $\nu$
+\begin{equation}\label{eq:BB:eq:ref:vecs:slant:tilt:psi}
+\left\{
+\begin{aligned}
+\e_2^\N &= \left( 0,\,\cos\sigma,-\sin\nu\sin\sigma \right)^\top\\
+\e_1^\N &= \left( -\sin^2\nu\sin^2\sigma - \cos^2\sigma,\,\sin\nu\sin\sigma,-\cos\sigma \right)^\top,
+\end{aligned}
+\right.
+\end{equation}
+which we plug into~\eqref{eq:BB:local:vecs:ref} to yield the principal directions in
+terms of $\sigma$, $\nu$, and $\psi$:
+\begin{equation}\label{eq:BB:eq:principal:direcs:slant:tilt:psi}
+\bar \e_1 = 
+\begin{bmatrix}
+-\cos\psi\sin^2\nu\sin^2\sigma - \cos\psi\cos^2\sigma\\
+\sin\psi\sin\nu\sin\sigma - \cos\psi\cos\sigma\\
+-\cos\psi\cos\sigma-\sin\psi\sin\nu\sin\sigma 
+\end{bmatrix},\ 
+\bar \e_2 = 
+\begin{bmatrix}
+-\sin\psi\sin^2\nu\sin^2\sigma - \sin\psi\cos^2\sigma\\
+\sin\psi\sin\nu\sin\sigma - \cos\psi\cos\sigma\\
+-\sin\psi\cos\sigma + \cos\psi\sin\nu\sin\sigma
+\end{bmatrix},
+\end{equation}
+written in camera coordinates.  Then, a point $\Gama(0)$ is related to $\lbar \Gama$ as
+\begin{equation}
+\Gama(0) = \lbar R_0\lbar \Gama + \lbar T_0,
+\end{equation}
+where
+\begin{align}
+\overline R_0 = 
+\begin{bmatrix}
+-\cos\psi\sin^2\nu\sin^2\sigma - \cos\psi\cos^2\sigma
+&-\sin\psi\sin^2\nu\sin^2\sigma - \sin\psi\cos^2\sigma & \cos\nu\sin\sigma\\
+\sin\psi\sin\nu\sin\sigma - \cos\psi\cos\sigma        &\sin\psi\sin\nu\sin\sigma - \cos\psi\cos\sigma        & \sin\nu\sin\sigma\\
+-\cos\psi\cos\sigma-\sin\psi\sin\nu\sin\sigma         &-\sin\psi\cos\sigma + \cos\psi\sin\nu\sin\sigma       & \cos\sigma
+\end{bmatrix},
+\end{align}
+and $\lbar\transl_0 = \left( \lbar\transl_x,\,\lbar\transl_y,\,\lbar\transl_z \right)^\top$.
+Note that  the first two columns of the camera matrix are the principal
+direction vectors written in camera coordinates and the third column is the
+normal in camera coordinates, all parametrized by $\sigma$, $\nu$ and $\psi$.
+
+\begin{proposition}
+Given a paraboloid 
+$\frac{1}{2}\lbar{\Gama}^\top\mathbf K\lbar{\Gama}
++ \e_3^\top\lbar{\Gama} = 0$ in the coordinate system defined by $\Gama_0 = \lbar
+R_0\lbar{\Gama}_0 + \lbar\transl$,
+and a camera motion defined by
+$R(t)$ and $\transl(t)$. Then, the equation of the paraboloid in camera
+coordinates is given by:
+\begin{equation}\label{eq:BB:paraboloid:xyz:thru:gama}
+\Gama^\top \mathbf K_c \Gama -2\overline \transl^\top \mathbf K_c\Gama + e_3^\top \overline R^\top\Gama +
+ \overline \transl^\top \mathbf K_c \overline \transl - e_3^\top \overline
+ R^\top \overline \transl = 0\,.
+\end{equation}
+where $\mathbf K_c = \frac{1}{2}\overline R \mathbf K \overline R^\top$, 
+$\mathbf K$ is the principal curvature matrix of the surface as defined in
+Equation~\eqref{eq:K:matrix}, $\overline R = R(t)\overline R_0$, and $\overline
+\transl = R(t)\overline\transl_0 + \transl(t)$.
+\end{proposition}
+\begin{proof}
+The main equations are:
+\begin{empheq}[left=\empheqlbrace]{align}
+\label{eq:BB:quadratic:matricial:b}
+\frac{1}{2}\overline \Gama^\top 
+&
+\mathbf K
+\overline \Gama
++ 
+e_3^\top
+\overline \Gama = 0
+&
+&\text{\small{(second-order surface model)}}
+\\
+%
+\Gama_0 &= \overline R_0\overline\Gama + \overline \transl_0 &
+&\text{\small{(Monge to camera coordinates at $t=0$)}}
+\label{eq:BB:gamat:from:gamabar}
+\\
+%
+\label{eq:BB:gamat:from:gamazero}
+\Gama(t) &= R(t)\Gama_0 + \transl(t)
+& &\text{\small{(camera coordinates at time t)}}\\
+%
+\Gama(t) &= \depth(t)\gama(t)& &\text{\small{(projection equation)}}\label{eq:BB:projection:B}
+\end{empheq}
+%
+%
+We have from~\eqref{eq:BB:gamat:from:gamabar} and~\eqref{eq:BB:gamat:from:gamazero}
+\begin{align}
+\Gama(t) &= R(t)\overline R_0\overline\Gama + R(t)\overline\transl_0 +
+  \transl(t)\nonumber\\
+&= \lbar R\lbar\Gama + \lbar\transl\,,
+\end{align}
+%
+giving
+%
+\begin{equation}
+\overline \Gama = \overline R(t)^\top \Gama(t) - \overline R(t)^\top \overline
+\transl(t)\,.
+\end{equation}
+Substituting this into the above equation~\eqref{eq:BB:quadratic:matricial:b}
+(for simplicity, the dependency on $t$ will not be written), we have
+%
+\begin{align}
+\frac{1}{2}\left[ \overline R^\top\Gama - \overline R^\top\overline \transl \right]^\top 
+\mathbf K
+\left[ \overline R^\top\Gama - \overline R^\top\overline \transl \right]
+%
+ + e_3^\top
+\left[ \overline R^\top\Gama - \overline R^\top\overline \transl \right]
+=0\,,
+%
+\end{align}
+or
+\begin{align}\label{eq:BB:paraboloid:xyz:trhu:gama:concise}
+\frac{1}{2}\left[ \Gama - \overline \transl \right]^\top \overline R \mathbf K  \overline R^\top \left[ \Gama -
+\overline \transl \right] 
+%
++ e_3^\top \overline R^\top \left[\Gama - \overline \transl\right] = 0\,.
+\end{align}
+Using $\mathbf K_c := \frac{1}{2}\overline R \mathbf K \overline R^\top$,
+distributing, and rearranging, we get the final equation.
+\end{proof}
+
+
+
+We are interested in an image neighborhood around a given center point
+$\gama_c(0) = \left[ \uu_c(0), \vv_c(0), 1 \right]^\top$ at $t=0$. The paraboloid approximation would
+then be around the 3D point $\Gama_c(0) = \left[ x_c(0), y_c(0), z_c(0) \right]^\top$,
+with the notation $\Gama_c(t) := \depth_c(t)\gama_c(t)$. In local coordinates, $\Gama_c(0)$ corresponds to 
+$\overline \Gama = \left[ 0, 0, 0 \right]^\top$, which, when plugged
+into~\eqref{eq:BB:worl:to:camera}, yields:
+\begin{equation}
+\Gama_c(0) = \overline \transl(0) = \overline\transl_0
+\end{equation}
+It is then clear that $\overline \transl(t)$ is the coordinates of the origin of the Monge
+patch with respect to the camera coordinates at time~$t$.
+From~\eqref{eq:BB:tbart:from:tbar0}, we can write:
+\begin{align}
+\overline{\rot}(t)&=\rot(t)\overline \Gama_c(0) + \transl(t)\\
+\overline{\transl}(t)&=\rot(t)\depth_c(0)\gama_c(0) + \transl(t)
+\end{align}
+Note that $\overline \transl(t) \neq \Gama_c(t)$, because $\Gama_c$ was defined with
+respect to the center of the image patch, $\gama_c$, which for any $t \neq 0$
+will not correspond to the origin of the 3D monge patch.
+Thus, given the image point $\gama_c(0)$ at $t=0$, the translation to the Monge patch is
+determined from a single number $\depth_c(0)$, so in total we need 6 parameters to
+determine our local surface model: 
+\begin{equation}
+\mathcal M = \left\{ \depth_c(0), \sigma,\nu,\psi, k_1, k_2 \right\}
+\end{equation}

@@ -1,0 +1,66 @@
+\mynewpage
+\chapter{Research Directions}\label{sec:future:directions}
+
+Our research is an effort of augmenting Multiple View Geometry to
+handle general curved structures, including curves, surfaces and non-rigid phenomena.
+The main lines of future research are: the theory and
+practice of the multiview differential geometry of surfaces, and
+the automatic curve-based calibration of multiple views. A more detailed list of
+future work is given below.
+
+
+\subsection{Theory}
+\begin{itemize}
+\item Curve-based calibration of 3 views. Research is underway in conjunction with prof.\ Peter Giblin to 
+solve the problem of determining trinocular relative pose from
+corresponding point-tangents across 3 views. Coupled with our single-view
+pose calibration method from Section~\ref{sec:pose:from:curves}, this would allow for complete
+curve-based structure from motion systems starting from a set of images 
+without any initial calibration. Extending these ideas to include
+curvature is another research possibility.
+\item Futher study of nonrigid phenomena.
+\end{itemize}
+
+\subsection{Practice}
+\begin{itemize}
+\item Enrichment of the proposed 3D curve sketch with surface patches. 
+The 3d curve sketch system is expected to form the initial building block in a broader effort to use
+image evidence of the explicit geometry of curves and surfaces and reconstruct
+these by integrating information across many views. The 3D curve sketch was
+designed to be the initial scaffold on which surfaces may be constructed. It
+forms a reliable structure from which to bootstrap a larger
+reconstruction system that works under general conditions. One idea for
+incorporating surfaces is the use of occlusion relationships to define a rough,
+preliminary surface structure between 3D curves. This initial model can
+then be optimized for photoconsistency to obtain a more precise surface model.
+One way to carry this out is to use a hypothesize-and-test framework, where we
+form hypotheses for whether there is a surface patch between two 3D curves, and
+test these hypothesis by reprojecting onto views and verifying consistency.
+Hypothesis formation could be image-based where we project the 3D curve sketch
+onto an image (or a series of reference images), and form region fragments
+between neighboring image curves. Each surface hypothesis could be tested by
+forming a rough surface model between the underlying 3D curves of the patch
+(\eg, a by fitting a minimal surface), and projecting the entire curve sketch
+onto another view. Using the model for the surface patch, one can predict what
+other curves should be occluded in case the hypothesis is correct. We then look
+in the image for any edges that would support the curves that should have been
+occluded. If there is support, then the curves are not actually occluded and the
+surface hypothesis must be false.  The baisc idea of using image region
+fragments has been successful as part of the top-performing 2-view stereo
+algorithms in the literature.   
+\item Image-based matching of curves in two and three views, so that these
+correspondences can be used to bootstrap camera calibration from curves. 
+We have done preliminary work using \sift\ descriptors attached to curves, and the
+matching results were very promising. The descriptors are rotated to match the
+tangent direction of the curve at each sample. There is room for improvement in terms of
+efficiency, as we are computing \sift\ descriptors at different scales
+for each curve sample, as well as matching all of them. Perhaps
+a subsampling strategy should be used, or even a different strategy where the
+histogram bins are placed on a global grid built around the entire curve.
+\item Extension of the qualitative/geometric ideas of
+Appendix~\ref{sec:epipolar} for epipolar geometry to curves. 
+\item Development of a better numeric method to measure curvature derivative,
+allowing to measure 3D torsion from image curves. Perhaps even a coarse but
+robust measurement of curvature derivative could be useful in practice.
+\end{itemize}
+

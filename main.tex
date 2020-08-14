@@ -1,0 +1,137 @@
+\input{preamble}
+
+\usepackage{colortbl}
+\usepackage{booktabs}
+
+
+% Simplified notation, used for trifocal research at ICERM
+% prefix s means ``simplified''
+% Basically identical to H&Z with adjustments to take into account constants,
+% as well as convenient notation for the normal case of trifocal geometry where
+% view 1 is the reference. Also, it must minimize conflict with IJCV'16 /
+% Bignotes.
+
+\newcommand{\srot}{\mathtt{R}} % rotation in simplified notation
+\newcommand{\stransl}{\mathbf{t}}  % translation vector in simplified notation
+\newcommand{\D}{\mathbf{D}} % 3D tangent direction in simplified notation
+\newcommand{\dir}{\mathbf{d}} % 2D tangent direction in simplified notation
+\newcommand{\li}{\mathbf{l}} % 2D line homog coordinates
+
+\newcommand{\eqr}[1]{$#1$}
+\newcommand{\sss}[2]{#1_#2}
+\newcommand{\ms}[3]{#1^#2_#3}
+\newcommand{\mss}[2]{#1^#2}
+\newcommand{\us}[3]{#1^{#2#3}}
+
+\usepackage[usestackEOL]{stackengine}
+\usepackage{scalerel}
+\parskip \baselineskip
+\def\myupbracefill#1{\rotatebox{90}{\stretchto{\{}{#1}}}
+\def\rlwd{.5pt}
+\newcommand\notate[4][B]{%
+  \if B#1\else\def\myupbracefill##1{}\fi%
+  \def\useanchorwidth{T}%
+  \setbox0=\hbox{$\displaystyle#2$}%
+  \def\stackalignment{c}\stackunder[-6pt]{%
+    \def\stackalignment{c}\stackunder[-1.5pt]{%
+      \stackunder[2pt]{\strut $\displaystyle#2$}{\myupbracefill{\wd0}}}{%
+    \textcolor{gray}{\rule{\rlwd}{#3\baselineskip}}}}{%p
+      \textcolor{gray}{\strut\kern9pt$\rightarrow$\smash{\rlap{$~\displaystyle#4$}}}}%
+}
+
+
+\includeonly{%
+  front-matter,
+  intro,
+  future,
+  todo,
+  rotation,
+  algebraic-geometry,
+  refs,
+}
+
+\makenomenclature
+\usepackage{bignotes_part2}
+
+\makeindex
+\setcounter{tocdepth}{1}
+
+% Redefine the plain page style
+\fancypagestyle{plain}{%
+\fancyfoot[CE,CO]{\hypersetup{ hidelinks = true, }\textsc{confidential draft, please cite}~\cite[IJCV]{Fabbri:Kimia:IJCV2016}\hypersetup{ hidelinks = false, }}
+\fancyfoot[LE,LO,RE,RO]{\thepage}
+\renewcommand{\headrulewidth}{0pt}% Line at the header invisible
+\fancyhead[RE]{}
+\fancyhead[RO]{}
+}
+
+\begin{document}
+
+\newpage
+\include{front-matter}
+\fancyhead{}
+\fancyhead{}
+\renewcommand{\headrulewidth}{0pt}% Line at the header invisible
+\newpage
+ 
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[CE,CO]{\hypersetup{ hidelinks = true, }\textsc{confidential draft, please cite}~\cite[IJCV]{Fabbri:Kimia:IJCV2016}\hypersetup{ hidelinks = false, }}
+\fancyfoot[LE,LO,RE,RO]{\thepage}
+
+\tableofcontents
+%\listoffigures
+%\printnomenclature[3.5cm]
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[CE,CO]{\hypersetup{ hidelinks = true, }\textsc{confidential draft, please cite}~\cite[IJCV]{Fabbri:Kimia:IJCV2016}\hypersetup{ hidelinks = false, }}
+\fancyfoot[LE,LO,RE,RO]{\thepage}
+
+\chapter{Foreword}
+
+
+\begin{itemize}
+\item This document contain research notes by Juliana Ventura, Ricardo Fabbri
+  and Francisco Duarte Moura Neto. 
+\end{itemize}
+
+\section*{How to Cite this Document}
+We ask that you at least
+cite~\cite{Fabbri:Kimia:IJCV2016,Fabbri:Kimia:Giblin:ECCV12},
+as well as other papers from~\url{http://rfabbri.github.io}.
+
+\section*{Disclaimer}
+If you gain access to this document, please:
+\begin{itemize}
+\item Don't blame us for statements that are wrong, this is a \textsc{research
+  draft}. Some stuff was written a really long time ago and may not reflect the
+  authors' complete and up-to-date knowledge!
+\item Kindly include us or invite us to participate on all work that you derive
+  from this manuscript. Be friendly.
+\item Intelectual property: this content is partly patented and is property of Brown
+  University, Rio de Janeiro State University, FAPERJ/Brazil, CNPq/Brazil, the
+  authors, and others. There may be material here that is not permissible to publish at all.
+\item Some of the material here is not by the authors. On all publications 
+  we will make sure to include all collaborator names properly. If you feel you
+  are not included, please contact us!
+\end{itemize}
+
+\section*{Acknowledgements}
+Special thanks to FAPERJ, CNPq and CAPES / Brazil, and ICERM / Brown University.
+
+\mainmatter
+\fancyhead[LE]{\nouppercase{\leftmark}}
+\fancyhead[RE]{\thepage}
+\fancyhead[LO]{\nouppercase{\rightmark}}
+\fancyhead[RO]{\thepage}
+
+\include{intro}
+\include{future}
+\include{todo}
+\include{rotation}
+%\include{projective-geometry}
+\include{algebraic-geometry}
+%\include{projective-differential-geometry}
+\include{refs}
+
+\end{document}

@@ -1,0 +1,85 @@
+\newpage
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\nouppercase{\leftmark}}
+\fancyhead[RE]{\thepage}
+\fancyhead[LO]{\nouppercase{\rightmark}}
+\fancyhead[RO]{\thepage}
+\fancyfoot[CE,CO]{\hypersetup{ hidelinks = true, }\textsc{confidential draft, please cite}~\cite[IJCV]{Fabbri:Kimia:IJCV2016}\hypersetup{ hidelinks = false, }}
+\fancyfoot[LE,LO,RE,RO]{\thepage}
+\mynewpage
+\chapter{Introduction}\label{sec:intro}
+
+\subsection{Applications and Broader Impacts}
+
+Computer vision is a branch of Artificial Intelligence concerned with the
+understanding of visual information by algorithms running in physical computers.
+Within computer vision, the present work is a module that lies at the interface
+of computerized photogrammetry, which is the science of extracting objective
+measurements from digital images, with higher level AI elements such as
+human-inspired levels of flexibility, robustness, semantic and qualitative reasoning. 
+
+The calibration of images taken from multiple views or
+video clips and the 3D reconstruction of \emph{general} scenes from these views in a
+robust and flexible way, under \emph{uncontrolled acquisition} conditions, are 
+paramount goals of computer vision (as opposed to classical photogrammetry),
+ambitious even by modern standards.\footnote{Differently than established
+literature~\cite{Hartley:Zisserman:book}, we
+found it clearer to a wider audience to employ the term `calibration' in the following sense:
+\emph{calibration} is a generic term including all types of ``camera estimation'' and ``relative camera geometry estimation'';
+intrinsic calibration is what is usually called simply `calibration', \ie, 
+estimating intrinsic camera parameters; 
+\emph{extrinsic calibration} means estimating the rotational and translational factors
+of the camera model,\ie, `pose estimation'; and \emph{full calibration} means both intrinsic
+and extrinsic calibration. There are intermediate calibrations as well, \eg, when estimating both the
+rotation, translation, and focal length, or estimating relative
+camera pose, fundamental matrices or trifocal tensors, in which case only a
+subset or variety in the camera parameters are being recovered, which may span across both
+intrinsic and extrinsic parameters.}
+%
+Challenges relate to the large-scale
+choices of appropriate representations and techniques to deal simultaneously
+with wildly different materials (\eg, non-Lambertian), geometric models (\eg,
+general curved manifolds, discontinuities, textures, deformations, at different
+scales), region types (\eg, textured and textureless regions), unknown
+illumination conditions, shadows and shades, large viewpoint differences,
+background clutter, arbitrary number of objects and unknown camera parameters,
+to name a few.  
+%
+Applications include the reconstruction of 3D object models for use in
+videogames~\cite{Ablan:3DPhoto:book},
+film~\cite{Ablan:3DPhoto:book,Kitagawa:Mocap:book},
+archaeology~\cite{Gay:etal:ACVA10,Luhmann:Photogrammetry:book},
+architecture~\cite{Luhmann:Photogrammetry:book}, and urban modeling (\eg,
+Google Streetview); match-moving in cinematography for mixing virtual content
+and real video~\cite{Dobbert:Matchmoving:book}, the organization of a
+collection of photographs with respect to a scene (\eg,
+Photourisim~\cite{Argarwal:Snavely:etal:ICCV09} and the Look Around feature in
+Google Panoramio), robotic manipulation~\cite{Horn:Robot:Vision}, metrology
+from cameras in the automobile industry~\cite{Luhmann:Photogrammetry:book}.
+Specific cases of more challenging applications of interest to this proposal
+have been addressed, such as the reconstruction of the ocean surface in certan
+conditions, for monitoring in offshore platforms and ships, as well as for
+change detection modulo sea
+motion~\cite{Benetazzo:CE2006,Benetazzo:CE2012,Gallego:etal:TGRS201,Fedele:etal:OM2013,Fedele:etal:MCS2012,Benetazzo:etal:CE2016,Gallego:etal:TIP2013,Bergamasco:etal:CG2016,Rapizo:etal:JCR2015,Fabbri:WaterWaves2016,Fabbri:WaterWaves2017,Souza:Fabbri:WaterWaves2017}.
+
+Most existing Structure from Motion and multiview stereo reconstruction methods
+suffer from some common problems such as: \emph{(i)} Not being able to bootstrap
+calibration from textureless objects; {\em (ii)} Holes in the 3D model
+corresponding to homogeneous/reflective/transparent image regions, {\em (iii)}
+Oversmoothing of semantically-important details such as ridges, {\em (iv)} Lack
+of semantically meaningful surface features, organization and geometric detail;
+{\em (v)} Insufficient reliable geometry to model non-rigid scenes.
+
+As prominent Microsoft Research scientist Andrew Fitzgibbon informally put it in
+an informal meeting with Fabbri in CVPR 2017, ``in order to 3D-scan a simple mug
+using ordinary cameras, we need better techniques''. He has also noted challenges in his image-based
+study of the smooth shape of dolphins~\cite{Fitzgibbon:PAMI:dolphincs}. 
+
+While a fully complete working system addressing all the underlying challenges
+is beyond current technology, significant progress has been made in the past few
+years using approaches that fall into three broad classes, depending on whether
+one focuses on correlating isolated points, surface patches, or curvilinear
+structures across views, as described below.
+
+
